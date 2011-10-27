@@ -56,42 +56,38 @@ class ShellInterface
 end
 
 class MetaPlugin
-  include Robut::Plugin
-
-  def usage
-    "#{at_nick} meta <plugin_name>, <usage_description>, <handler code> - injects a plugin that does <handler_code> according to <usage>"
-  end
-
-  def handle(time, sender_nick, message)
-    return unless sent_to_me?(message)
-    words = words(message)
-    command = words.shift.downcase
-    return unless command == 'meta'
-    /\<(.+)\>, \<(.+)\>, \<(.+)\>/.match(words.join(' '))
-    plugin_name, usage, code = $1, $2, $3
-    add_plugin plugin_name, usage, code
-  end
-
   def add_plugin plugin, usage, code
     plugincode = <<EOF
     class #{plugin.capitalize}
       include Robut::Plugin
 
       def usage
-        "#{usage}"
+        #{usage}
       end
 
       def handle(time, sender_nick, message)
         #{code}
       end
     end
-    Robut::Plugin.plugins -= [#{plugin.capitalize}] if Robut::Plugin.plugins.include? #{plugin.capitalize}
     Robut::Plugin.plugins << #{plugin.capitalize}
 EOF
-  File.open("lib/robut/plugin/#{plugin.downcase}.rb", "w") { |f| f.write(plugincode) }
-  eval plugincode
-  #File.open("Chatfile", "w") {|f| a= f.read; f.write("require \"robut/plugin/#{plugin.downcase}\" \n #{a}") }
+  File.new("#{plugin.downcase}.rb", "w") { |f| f.write(plugincode) }
   end
+
+  def usage
+    "#{at_nick} meta <plugin_name>, <usage_description>, <handler code> - injects a plugin that does <handler_code> according to <usage>"
+  end
+
+  def handle(time, sender_nick, message)
+    return unless set_to_me?(message)
+    words = words(message)
+    command = words.shift.downcase
+    return unless command == 'meta'
+    /\<(.+)\>, \<(.+)\>, \<(.+)\>/.match(command)
+    plugin_name, usage, code = $1, $2, $3
+    add_plugin plugin_name, usage, code
+  end
+
 end
 
 Robut::Plugin.plugins << RakeTasks

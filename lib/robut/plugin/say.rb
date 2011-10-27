@@ -1,29 +1,13 @@
-# This is a simple plugin the envokes the "say" command on whatever is passed
-# Example:
-#
-#    @robut say that was awesome!
-#
-# *Requires that the "say" command is installed and in the path
-#
-class Robut::Plugin::Say
-  include Robut::Plugin
+    class Say
+      include Robut::Plugin
 
-  # Returns a description of how to use this plugin
-  def usage
-    "#{at_nick} say <words> - uses Mac OS X's 'say' command to speak <words>"
-  end
-  
-  # Pipes +message+ through the +say+ command
-  def handle(time, sender_nick, message)
-    words = words(message)
-    if sent_to_me?(message) && words.first == "say"
-      phrase = clean(words[1..-1].join(' '))
-      system("say #{phrase}")
+      def usage
+        "#{at_nick} say <args> - will say args using mac os x say shell command"
+      end
+
+      def handle(time, sender_nick, message)
+         return unless sent_to_me?(message); words = words(message); command = words.shift.downcase; return unless command == 'say'; `say -v "Good News" #{words.join(' ')}`;
+      end
     end
-  end
-
-  def clean(str)
-    str.gsub("'", "").gsub(/[^A-Za-z0-9\s]+/, " ").gsub(/\s+/, ' ').strip
-  end
-
-end
+    Robut::Plugin.plugins -= [Say] if Robut::Plugin.plugins.include? Say
+    Robut::Plugin.plugins << Say
