@@ -17,7 +17,12 @@ class Robut::Plugin::Meme
     'business_cat' => 'http://memecaptain.com/business_cat.jpg',
     'all_the_things' => 'http://memecaptain.com/all_the_things.jpg',
     'fry' => 'http://memecaptain.com/fry.png',
-    'sap' => 'http://memecaptain.com/sap.jpg'
+    'sap' => 'http://memecaptain.com/sap.jpg',
+    'racist_dog' => 'http://f.cl.ly/items/061w0S2u1N3s0p1F3O0C/15379.jpg',
+    'forever_alone' => 'http://images.memegenerator.net/images/500x/142442.jpg',
+    'joseph_ducreux' => 'http://images.memegenerator.net/images/500x/42.jpg',
+    'success_kid' => 'http://images.memegenerator.net/images/500x/1031.jpg',
+    'yo_dawg' => 'http://images.memegenerator.net/images/600x/108785.jpg'
   }
 
   # Returns a description of how to use this plugin
