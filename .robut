@@ -1,0 +1,7 @@
+--- 
+aliases: 
+  say: sing
+  list: ""
+  sing: say that you love me
+  <sing>: <say something beatiful>
+  ss: sing something nice

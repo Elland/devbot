@@ -9,5 +9,3 @@
          return unless sent_to_me?(message); words = words(message); command = words.shift.downcase; return unless command == 'lol'; reply("@#{sender_nick} lol dude");
       end
     end
-    Robut::Plugin.plugins -= [Lol] if Robut::Plugin.plugins.include? Lol
-    Robut::Plugin.plugins << Lol

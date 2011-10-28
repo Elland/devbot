@@ -96,7 +96,7 @@ class Robut::Connection
     # ignore all messages sent by robut. If you really want robut to
     # reply to itself, you can use +fake_message+.
     return if nick == config.nick
-    
+
     plugins.each do |plugin|
       begin
         rsp = plugin.handle(time, nick, message)
@@ -127,7 +127,6 @@ class Robut::Connection
       plugins = Robut::Plugin.plugins.map { |p| p.new(self, nil) }
       handle_message(plugins, time, nick, message)
     end
-
     # Add the callback from direct messages. Turns out the
     # on_private_message callback doesn't do what it sounds like, so I
     # have to go a little deeper into xmpp4r to get this working.
