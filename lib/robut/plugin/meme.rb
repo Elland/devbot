@@ -1,35 +1,30 @@
 require 'cgi'
+require 'yaml'
+require 'yaml/store'
 
 # A simple plugin that wraps memecaptain.
 class Robut::Plugin::Meme
   include Robut::Plugin
 
-  MEMES = {
-    'bear_grylls' => 'http://memecaptain.com/bear_grylls.jpg',
-    'insanity_wolf' => 'http://memecaptain.com/insanity_wolf.jpg',
-    'most_interesting' => 'http://memecaptain.com/most_interesting.jpg',
-    'philosoraptor' => 'http://memecaptain.com/philosoraptor.jpg',
-    'scumbag_steve' => 'http://memecaptain.com/scumbag_steve.jpg',
-    'town_crier' => 'http://memecaptain.com/town_crier.jpg',
-    'troll_face' => 'http://memecaptain.com/troll_face.jpg',
-    'y_u_no' => 'http://memecaptain.com/y_u_no.jpg',
-    'yao_ming' => 'http://memecaptain.com/yao_ming.jpg',
-    'business_cat' => 'http://memecaptain.com/business_cat.jpg',
-    'all_the_things' => 'http://memecaptain.com/all_the_things.jpg',
-    'fry' => 'http://memecaptain.com/fry.png',
-    'sap' => 'http://memecaptain.com/sap.jpg',
-    'racist_dog' => 'http://f.cl.ly/items/061w0S2u1N3s0p1F3O0C/15379.jpg',
-    'forever_alone' => 'http://images.memegenerator.net/images/500x/142442.jpg',
-    'joseph_ducreux' => 'http://images.memegenerator.net/images/500x/42.jpg',
-    'success_kid' => 'http://images.memegenerator.net/images/500x/1031.jpg',
-    'yo_dawg' => 'http://images.memegenerator.net/images/600x/108785.jpg'
-  }
+  def store
+    store = YAML::Store.new 'memes.yml'
+    store.transaction do
+      @memes.each_pair do |name, url|
+        store[name] = url
+      end
+    end
+  end
+
+  def reload
+    @memes = YAML::load File.open('memes.yml')
+  end
 
   # Returns a description of how to use this plugin
   def usage
     [
       "#{at_nick} meme list - lists all the memes that #{nick} knows about",
-      "#{at_nick} meme <meme> <line1>;<line2> - responds with a link to a generated <meme> image using <line1> and <line2>"
+      "#{at_nick} meme <meme> <line1>;<line2> - responds with a link to a generated <meme> image using <line1> and <line2>",
+      "#{at_nick} meme add <alias> <url> - adds image macro to the meme generator list"
     ]
   end
 
@@ -51,11 +46,15 @@ class Robut::Plugin::Meme
     command = words.shift.downcase
     return unless command == 'meme'
     meme = words.shift
-
+    reload
     if meme == 'list'
-      reply("Memes available: #{MEMES.keys.join(', ')}")
-    elsif MEMES[meme]
-      url = CGI.escape(MEMES[meme])
+      reply("Memes available: #{@memes.keys.join(', ')}")
+    elsif meme.include? 'add'
+      words.shift
+      @memes[words.first] = words.last
+      store
+    elsif @memes[meme]
+      url = CGI.escape(@memes[meme])
       line1, line2 = words.join(' ').split(';').map { |line| CGI.escape(line.strip)}
       meme_url = "http://memecaptain.com/i?u=#{url}&tt=#{line1}"
       meme_url += "&tb=#{line2}" if line2
